@@ -28,10 +28,10 @@ const createNewPost = async (req, res) => {
       userId: req.user.id,
     });
 
-    return res.status(200).json(newPost);
+    return res.status(201).json(newPost);
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -61,7 +61,7 @@ const getPost = async (req, res) => {
     return res.status(200).json(postData);
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -84,12 +84,12 @@ const likePost = async (req, res) => {
       { new: true }
     );
 
-    if (!like) return res.status(400).json({ message: "Post does not exist" });
+    if (!like) return res.status(404).json({ message: "Post does not exist" });
 
     return res.status(200).json({ message: "Post liked successfully" });
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -108,7 +108,7 @@ const deletePost = async (req, res) => {
     // check if the post post belongs to the user or not
     if (post.userId.toString() !== userID)
       return res
-        .status(404)
+        .status(403)
         .json({ message: "Post does not belongs to the user" });
 
     await Post.findByIdAndDelete({ _id: postID });
@@ -123,7 +123,7 @@ const deletePost = async (req, res) => {
     return res.status(200).json({ message: "Post successfully deleted" });
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -139,7 +139,7 @@ const updatePost = async (req, res) => {
 
     // find post
     const post = await Post.findById({ _id: postID });
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (!post) return res.status(403).json({ message: "Post not found" });
 
     // check if the post post belongs to the user or not
     if (post.userId.toString() !== userID)
@@ -168,7 +168,7 @@ const updatePost = async (req, res) => {
 
     return res.status(200).json({ message: "Post updated successfully" });
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -191,7 +191,7 @@ const addComment = async (req, res) => {
     const post = await Post.findById({ _id: postId });
 
     // if post not found return
-    if (!post) return res.status(400).json({ message: "Post not found" });
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
     // if post found add comment
     const comm = await Comment.create({
@@ -200,10 +200,10 @@ const addComment = async (req, res) => {
       postId,
     });
 
-    return res.status(200).json(comm);
+    return res.status(201).json(comm);
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -244,7 +244,7 @@ const deleteComment = async (req, res) => {
     return res.status(200).json({ message: "Comment successfully deleted" });
   } catch (err) {
     console.log(err.message);
-    return res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
