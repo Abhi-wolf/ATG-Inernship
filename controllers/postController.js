@@ -1,5 +1,6 @@
 const Post = require("../model/postModel");
 const Comment = require("../model/commentModel");
+const { EncryptField, DecryptField } = require("../utils/Encryption");
 
 // @desc Create a new post
 // @route GET /api/posts/createPost
@@ -21,9 +22,12 @@ const createNewPost = async (req, res) => {
     const imageArray = imagesPath.map((obj) => obj.path);
     console.log(imageArray);
 
+    // encrypt content
+    const encryptedData = await EncryptField(content);
+
     // create new post
     const newPost = await Post.create({
-      content,
+      content: encryptedData,
       images: imageArray,
       userId: req.user.id,
     });
@@ -43,15 +47,27 @@ const getPost = async (req, res) => {
     const { id } = req.params;
 
     // get post
-    const post = await Post.findById({ _id: id }).select(
-      "content images likes"
-    );
+    let post = await Post.findById({ _id: id }).select("content images likes");
     if (!post) return res.status(400).json({ message: "Post not found" });
 
     // get comments for the post
-    const comments = await Comment.find({ postId: post._id }).select(
+    let comments = await Comment.find({ postId: post._id }).select(
       "content userId"
     );
+
+    // decrypt post content
+    post.content = await DecryptField(post.content);
+
+    // Decrypt content of each comment
+    for (let i = 0; i < comments.length; i++) {
+      try {
+        const decryptedContent = await DecryptField(comments[i].content);
+        comments[i].content = decryptedContent;
+      } catch (error) {
+        console.error("Error decrypting comment content:", error.message);
+        return res.status(400).json({ message: error.message });
+      }
+    }
 
     const postData = {
       post,
@@ -157,9 +173,12 @@ const updatePost = async (req, res) => {
     // extract image paths to an image array
     const imageArray = imagesPath.map((obj) => obj.path);
 
+    // encrypt content
+    const encryptedData = await EncryptField(content);
+
     // update post
     const updatedPost = await Post.findOneAndUpdate({
-      content,
+      content: encryptedData,
       images: imageArray,
       userId: req.user.id,
     });
@@ -193,9 +212,11 @@ const addComment = async (req, res) => {
     // if post not found return
     if (!post) return res.status(404).json({ message: "Post not found" });
 
+    const encryptedData = await EncryptField(content);
+
     // if post found add comment
     const comm = await Comment.create({
-      content,
+      content: encryptedData,
       userId,
       postId,
     });

@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
           },
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "100m" }
+        { expiresIn: "10000m" }
       );
 
       res.status(200).json({

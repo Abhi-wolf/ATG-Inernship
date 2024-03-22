@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const EncryptField = require("../utils/Encryption");
 
 const commentSchema = mongoose.Schema(
   {
@@ -21,5 +22,10 @@ const commentSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// commentSchema.pre("save", function (next) {
+//   this.content = EncryptField(this.content, process.env.ENCRYPTION_KEY);
+//   next();
+// });
 
 module.exports = mongoose.model("Comment", commentSchema);
