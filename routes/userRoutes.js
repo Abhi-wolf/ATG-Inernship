@@ -7,7 +7,11 @@ const {
   resetPassword,
 } = require("../controllers/userController");
 
-const validateToken = require("../middleware/validateTokenHandler");
+// for authentication using localStorage
+// const validateToken = require("../middleware/validateTokenHandler");
+
+// for authentication using cookies
+const { isAuthenticated } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -15,6 +19,6 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/forgotPassword", forgotPassword);
 router.patch("/resetPassword", resetPassword);
-router.get("/current", validateToken, currentUser);
+router.get("/current", isAuthenticated, currentUser);
 
 module.exports = router;

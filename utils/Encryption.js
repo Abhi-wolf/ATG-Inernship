@@ -1,4 +1,3 @@
-const { rejects } = require("assert");
 const crypto = require("crypto");
 
 const secretKey = Buffer.from(process.env.SECRET_KEY, "hex");

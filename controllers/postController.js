@@ -6,9 +6,6 @@ const { EncryptField, DecryptField } = require("../utils/Encryption");
 // @route GET /api/posts/createPost
 // @access private
 const createNewPost = async (req, res) => {
-  // console.log("body = ", req.body);
-  // console.log("files = ", req.files);
-
   try {
     const { content } = req.body;
     let imagesPath = req.files?.images;
@@ -148,7 +145,6 @@ const deletePost = async (req, res) => {
 // @access private
 const updatePost = async (req, res) => {
   try {
-    console.log(req.body);
     const { id: postID } = req.params;
     const { id: userID } = req.user;
     const { content } = req.body;
@@ -183,8 +179,6 @@ const updatePost = async (req, res) => {
       userId: req.user.id,
     });
 
-    console.log(updatedPost);
-
     return res.status(200).json({ message: "Post updated successfully" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -199,9 +193,6 @@ const addComment = async (req, res) => {
     const { id: postId } = req.params;
     const { id: userId } = req.user;
     const { content } = req.body;
-
-    console.log("postId = ", postId);
-    console.log("userId = ", userId);
 
     if (!content)
       return res.status(400).json({ message: "Please add the comment" });
@@ -244,9 +235,6 @@ const deleteComment = async (req, res) => {
     const comment = await Comment.find({ _id: commentID });
     if (!comment[0])
       return res.status(404).json({ message: "Comment not found" });
-
-    // console.log("comment user id = ", comment[0].userId);
-    // console.log("userID = ", userID);
 
     // check if the comment belongs to the post or not
     if (comment[0].postId.toString() !== postID)

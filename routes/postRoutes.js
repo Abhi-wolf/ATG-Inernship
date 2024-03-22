@@ -11,8 +11,14 @@ const {
   updatePost,
 } = require("../controllers/postController");
 const upload = require("../middleware/multerMiddleware");
+const { isAuthenticated } = require("../middleware/authMiddleware");
 
-router.use(validateToken);
+// middleware for authentication using localStorage
+// router.use(validateToken);
+
+// middleware for authentication using cookies
+router.use(isAuthenticated);
+
 router.post(
   "/createPost",
   upload.fields([{ name: "images", maxCount: 3 }]),

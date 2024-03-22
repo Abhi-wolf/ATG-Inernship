@@ -16,12 +16,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/* VALIDATION_ERROR: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  SERVER_ERROR: 500, */
-
 // @desc Register a user
 // @route GET /api/users/register
 // @access public
@@ -98,7 +92,7 @@ const loginUser = async (req, res) => {
 
     // compare password with hashed password and generate the jwt token and send in the response
     if (user && (await bcrypt.compare(password, user.password))) {
-      const accessToken = jwt.sign(
+      const token = jwt.sign(
         {
           user: {
             userName: user.userName,
@@ -110,13 +104,25 @@ const loginUser = async (req, res) => {
         { expiresIn: "10000m" }
       );
 
-      res.status(200).json({
-        accessToken,
-        id: user._id,
+      // for authentication using cookies
+      const options = {
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+      };
+      res.cookie("token", token, options).status(200).json({
+        message: "login successful",
+        token,
+        success: true,
       });
+
+      // for authentication using localStorage
+      // res.status(200).json({
+      //   accessToken,
+      //   id: user._id,
+      // });
     } else {
       res.status(401);
-      throw new Error("username or password is not valid");
+      throw new Error("Username or Password is not valid");
     }
   } catch (err) {
     console.log(err.message);

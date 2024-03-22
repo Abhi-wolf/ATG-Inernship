@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config({
   path: "./config.env",
 });
 const mongoose = require("mongoose");
+const cookieparser = require("cookie-parser");
 const connectDb = require("./config/dbConnection");
 
 // connect to database
@@ -13,6 +14,7 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
+app.use(cookieparser()); // for authentication using cookies
 app.use(cors());
 app.use(express.json());
 app.use("/api/users", require("./routes/userRoutes"));
